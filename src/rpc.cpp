@@ -488,7 +488,7 @@ void RPC::refreshReceivedZTrans(QList<QString> zaddrs) {
     );
 } 
 
-/// This will refresh all the balance data from zcashd
+/// This will refresh all the balance data from komodod
 void RPC::refresh(bool force) {
     if  (conn == nullptr) 
         return noConnection();
@@ -576,7 +576,7 @@ void RPC::getInfoThenRefresh(bool force) {
             Settings::getInstance()->setSyncing(isSyncing);
             Settings::getInstance()->setBlockNumber(blockNumber);
 
-            // Update zcashd tab if it exists
+            // Update komodod tab if it exists
             if (ezcashd) {
                 if (isSyncing) {
                     QString txt = QString::number(blockNumber);
@@ -608,28 +608,28 @@ void RPC::getInfoThenRefresh(bool force) {
             auto zecPrice = Settings::getUSDFormat(1);
             QString tooltip;
             if (connections > 0) {
-                tooltip = QObject::tr("Connected to zcashd");
+                tooltip = QObject::tr("Connected to komodod");
             }
             else {
-                tooltip = QObject::tr("zcashd has no peer connections");
+                tooltip = QObject::tr("komodod has no peer connections");
             }
 
             if (!zecPrice.isEmpty()) {
-                tooltip = "1 ZEC = " % zecPrice % "\n" % tooltip;
+                tooltip = "1 KMD = " % zecPrice % "\n" % tooltip;
             }
             main->statusLabel->setToolTip(tooltip);
             main->statusIcon->setToolTip(tooltip);
         });
 
     }, [=](QNetworkReply* reply, const json&) {
-        // zcashd has probably disappeared.
+        // komodod has probably disappeared.
         this->noConnection();
 
         // Prevent multiple dialog boxes, because these are called async
         static bool shown = false;
         if (!shown && prevCallSucceeded) { // show error only first time
             shown = true;
-            QMessageBox::critical(main, QObject::tr("Connection Error"), QObject::tr("There was an error connecting to zcashd. The error was") + ": \n\n"
+            QMessageBox::critical(main, QObject::tr("Connection Error"), QObject::tr("There was an error connecting to komodod. The error was") + ": \n\n"
                 + reply->errorString(), QMessageBox::StandardButton::Ok);
             shown = false;
         }
@@ -903,7 +903,7 @@ void RPC::watchTxStatus() {
     });
 }
 
-// Get the ZEC->USD price from coinmarketcap using their API
+// Get the KMD->USD price from coinmarketcap using their API
 void RPC::refreshZECPrice() {
     if  (conn == nullptr) 
         return noConnection();
@@ -939,7 +939,7 @@ void RPC::refreshZECPrice() {
             }
 
             for (const json& item : parsed.get<json::array_t>()) {
-                if (item["symbol"].get<json::string_t>() == "ZEC") {
+                if (item["symbol"].get<json::string_t>() == "KMD") {
                     QString price = QString::fromStdString(item["price_usd"].get<json::string_t>());
                     qDebug() << "ZEC Price=" << price;
                     Settings::getInstance()->setZECPrice(price.toDouble());
@@ -958,9 +958,9 @@ void RPC::refreshZECPrice() {
 }
 
 void RPC::shutdownZcashd() {
-    // Shutdown embedded zcashd if it was started
+    // Shutdown embedded komodod if it was started
     if (ezcashd == nullptr || conn == nullptr) {
-        // No zcashd running internally, just return
+        // No komodod running internally, just return
         return;
     }
 
@@ -977,8 +977,8 @@ void RPC::shutdownZcashd() {
     Ui_ConnectionDialog connD;
     connD.setupUi(&d);
     connD.topIcon->setBasePixmap(QIcon(":/icons/res/icon.ico").pixmap(256, 256));
-    connD.status->setText(QObject::tr("Please wait for zec-qt-wallet to exit"));
-    connD.statusDetail->setText(QObject::tr("Waiting for zcashd to exit"));
+    connD.status->setText(QObject::tr("Please wait for kmd-qt-wallet to exit"));
+    connD.statusDetail->setText(QObject::tr("Waiting for komodod to exit"));
 
     QTimer waiter(main);
 
@@ -990,7 +990,7 @@ void RPC::shutdownZcashd() {
 
         if ((ezcashd->atEnd() && ezcashd->processId() == 0) ||
             waitCount > 30 || 
-            conn->config->zcashDaemon)  {   // If zcashd is daemon, then we don't have to do anything else
+            conn->config->zcashDaemon)  {   // If komodod is daemon, then we don't have to do anything else
             qDebug() << "Ended";
             waiter.stop();
             QTimer::singleShot(1000, [&]() { d.accept(); });

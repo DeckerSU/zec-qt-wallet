@@ -11,8 +11,8 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
-    QCoreApplication::setOrganizationName("zec-qt-wallet-org");
-    QCoreApplication::setApplicationName("zec-qt-wallet");
+    QCoreApplication::setOrganizationName("kmd-qt-wallet-org");
+    QCoreApplication::setApplicationName("kmd-qt-wallet");
 
     QString locale = QLocale::system().name();
     locale.truncate(locale.lastIndexOf('_'));   // Get the language code
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     }
 
     MainWindow w;
-    w.setWindowTitle("zec-qt-wallet v" + QString(APP_VERSION));
+    w.setWindowTitle("kmd-qt-wallet v" + QString(APP_VERSION));
     w.show();
     
     return QApplication::exec();

@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    logger = new Logger(this, QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).filePath("zec-qt-wallet.log"));
+    logger = new Logger(this, QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).filePath("kmd-qt-wallet.log"));
 
     // Status Bar
     setupStatusBar();
@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Set up check for updates action
     QObject::connect(ui->actionCheck_for_Updates, &QAction::triggered, [=] () {
-        QDesktopServices::openUrl(QUrl("https://github.com/ZcashFoundation/zec-qt-wallet/releases"));
+        QDesktopServices::openUrl(QUrl("https://github.com/DeckerSU/zec-qt-wallet/releases"));
     });
 
     // Import Private Key
@@ -76,7 +76,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Initialize to the balances tab
     ui->tabWidget->setCurrentIndex(0);
 
-    // The zcashd tab is hidden by default, and only later added in if the embedded zcashd is started
+    // The komodod tab is hidden by default, and only later added in if the embedded komodod is started
     zcashdtab = ui->tabWidget->widget(4);
     ui->tabWidget->removeTab(4);
 
@@ -376,7 +376,7 @@ void MainWindow::setupSettingsModal() {
         // Setup clear button
         QObject::connect(settings.btnClearSaved, &QCheckBox::clicked, [=]() {
             if (QMessageBox::warning(this, "Clear saved history?",
-                "Shielded z-Address transactions are stored locally in your wallet, outside zcashd. You may delete this saved information safely any time for your privacy.\nDo you want to delete the saved shielded transactions now?",
+                "Shielded z-Address transactions are stored locally in your wallet, outside komodod. You may delete this saved information safely any time for your privacy.\nDo you want to delete the saved shielded transactions now?",
                 QMessageBox::Yes, QMessageBox::Cancel)) {
                     SentTxStore::deleteHistory();
                     // Reload after the clear button so existing txs disappear
@@ -402,7 +402,7 @@ void MainWindow::setupSettingsModal() {
         if (rpc->getEZcashD() == nullptr) {
             settings.chkTor->setEnabled(false);
             settings.lblTor->setEnabled(false);
-            QString tooltip = tr("Tor configuration is available only when running an embedded zcashd.");
+            QString tooltip = tr("Tor configuration is available only when running an embedded komodod.");
             settings.chkTor->setToolTip(tooltip);
             settings.lblTor->setToolTip(tooltip);
         }
@@ -411,7 +411,7 @@ void MainWindow::setupSettingsModal() {
         QIntValidator validator(0, 65535);
         settings.port->setValidator(&validator);
 
-        // If values are coming from zcash.conf, then disable all the fields
+        // If values are coming from komodo.conf, then disable all the fields
         auto zcashConfLocation = Settings::getInstance()->getZcashdConfLocation();
         if (!zcashConfLocation.isEmpty()) {
             settings.confMsg->setText("Settings are being read from \n" + zcashConfLocation);
@@ -428,7 +428,7 @@ void MainWindow::setupSettingsModal() {
             settings.rpcuser->setText(conf.rpcuser);
             settings.rpcpassword->setText(conf.rpcpassword);
 
-            settings.confMsg->setText("No local zcash.conf found. Please configure connection manually.");
+            settings.confMsg->setText("No local komodo.conf found. Please configure connection manually.");
             settings.hostname->setEnabled(true);
             settings.port->setEnabled(true);
             settings.rpcuser->setEnabled(true);
@@ -455,7 +455,7 @@ void MainWindow::setupSettingsModal() {
                 rpc->getConnection()->config->proxy = "proxy=127.0.0.1:9050";
 
                 QMessageBox::information(this, tr("Enable Tor"), 
-                    tr("Connection over Tor has been enabled. To use this feature, you need to restart zec-qt-wallet."), 
+                    tr("Connection over Tor has been enabled. To use this feature, you need to restart kmd-qt-wallet."), 
                     QMessageBox::Ok);
             }
             if (isUsingTor && !settings.chkTor->isChecked()) {
@@ -464,7 +464,7 @@ void MainWindow::setupSettingsModal() {
                 rpc->getConnection()->config->proxy.clear();
 
                 QMessageBox::information(this, tr("Disable Tor"),
-                    tr("Connection over Tor has been disabled. To fully disconnect from Tor, you need to restart zec-qt-wallet."),
+                    tr("Connection over Tor has been disabled. To fully disconnect from Tor, you need to restart kmd-qt-wallet."),
                     QMessageBox::Ok);
             }
 
@@ -504,9 +504,9 @@ void MainWindow::donate() {
                             Settings::getInstance()->isSaplingAddress(ui->inputsCombo->currentText())));
     ui->Address1->setCursorPosition(0);
     ui->Amount1->setText("0.01");
-    ui->MemoTxt1->setText(tr("Thanks for supporting zec-qt-wallet!"));
+    ui->MemoTxt1->setText(tr("Thanks for supporting kmd-qt-wallet!"));
 
-    ui->statusBar->showMessage(tr("Donate 0.01 ") % Settings::getTokenName() % tr(" to support zec-qt-wallet"));
+    ui->statusBar->showMessage(tr("Donate 0.01 ") % Settings::getTokenName() % tr(" to support kmd-qt-wallet"));
 
     // And switch to the send tab.
     ui->tabWidget->setCurrentIndex(1);
@@ -664,7 +664,7 @@ void MainWindow::importPrivKey() {
     pui.buttonBox->button(QDialogButtonBox::Save)->setVisible(false);
     pui.helpLbl->setText(QString() %
                         tr("Please paste your private keys (z-Addr or t-Addr) here, one per line") % ".\n" %
-                        tr("The keys will be imported into your connected zcashd node"));  
+                        tr("The keys will be imported into your connected komodod node"));  
 
     if (d.exec() == QDialog::Accepted && !pui.privKeyTxt->toPlainText().trimmed().isEmpty()) {
         auto rawkeys = pui.privKeyTxt->toPlainText().trimmed().split("\n");
@@ -706,14 +706,14 @@ void MainWindow::exportTransactions() {
 
 /**
  * Backup the wallet.dat file. This is kind of a hack, since it has to read from the filesystem rather than an RPC call
- * This might fail for various reasons - Remote zcashd, non-standard locations, custom params passed to zcashd, many others
+ * This might fail for various reasons - Remote komodod, non-standard locations, custom params passed to komodod, many others
 */
 void MainWindow::backupWalletDat() {
     if (!rpc->getConnection())
         return;
 
     QDir zcashdir(rpc->getConnection()->config->zcashDir);
-    QString backupDefaultName = "zcash-wallet-backup-" + QDateTime::currentDateTime().toString("yyyyMMdd") + ".dat";
+    QString backupDefaultName = "komodo-wallet-backup-" + QDateTime::currentDateTime().toString("yyyyMMdd") + ".dat";
 
     if (Settings::getInstance()->isTestnet()) {
         zcashdir.cd("testnet3");
@@ -723,7 +723,7 @@ void MainWindow::backupWalletDat() {
     QFile wallet(zcashdir.filePath("wallet.dat"));
     if (!wallet.exists()) {
         QMessageBox::critical(this, tr("No wallet.dat"), tr("Couldn't find the wallet.dat on this computer") + "\n" +
-            tr("You need to back it up from the machine zcashd is running on"), QMessageBox::Ok);
+            tr("You need to back it up from the machine komodod is running on"), QMessageBox::Ok);
         return;
     }
     

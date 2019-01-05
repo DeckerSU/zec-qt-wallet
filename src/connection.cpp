@@ -36,7 +36,7 @@ void ConnectionLoader::doAutoConnect(bool tryEzcashdStart) {
         return;
     }
 
-    // Priority 2: Try to connect to detect zcash.conf and connect to it.
+    // Priority 2: Try to connect to detect komodo.conf and connect to it.
     auto config = autoDetectZcashConf();
     main->logger->write(QObject::tr("Attempting autoconnect"));
 
@@ -44,58 +44,58 @@ void ConnectionLoader::doAutoConnect(bool tryEzcashdStart) {
         auto connection = makeConnection(config);
 
         refreshZcashdState(connection, [=] () {
-            // Refused connection. So try and start embedded zcashd
+            // Refused connection. So try and start embedded komodod
             if (Settings::getInstance()->useEmbedded()) {
                 if (tryEzcashdStart) {
-                    this->showInformation(QObject::tr("Starting embedded zcashd"));
+                    this->showInformation(QObject::tr("Starting embedded komodod"));
                     if (this->startEmbeddedZcashd()) {
-                        // Embedded zcashd started up. Wait a second and then refresh the connection
-                        main->logger->write("Embedded zcashd started up, trying autoconnect in 1 sec");
+                        // Embedded komodod started up. Wait a second and then refresh the connection
+                        main->logger->write("Embedded komodod started up, trying autoconnect in 1 sec");
                         QTimer::singleShot(1000, [=]() { doAutoConnect(); } );
                     } else {
                         if (config->zcashDaemon) {
-                            // zcashd is configured to run as a daemon, so we must wait for a few seconds
+                            // komodod is configured to run as a daemon, so we must wait for a few seconds
                             // to let it start up. 
-                            main->logger->write("zcashd is daemon=1. Waiting for it to start up");
-                            this->showInformation(QObject::tr("zcashd is set to run as daemon"), QObject::tr("Waiting for zcashd"));
-                            QTimer::singleShot(5000, [=]() { doAutoConnect(/* don't attempt to start ezcashd */ false); });
+                            main->logger->write("komodod is daemon=1. Waiting for it to start up");
+                            this->showInformation(QObject::tr("komodod is set to run as daemon"), QObject::tr("Waiting for komodod"));
+                            QTimer::singleShot(5000, [=]() { doAutoConnect(/* don't attempt to start ekomodod */ false); });
                         } else {
                             // Something is wrong. 
                             // We're going to attempt to connect to the one in the background one last time
                             // and see if that works, else throw an error
-                            main->logger->write("Unknown problem while trying to start zcashd");
-                            QTimer::singleShot(2000, [=]() { doAutoConnect(/* don't attempt to start ezcashd */ false); });
+                            main->logger->write("Unknown problem while trying to start komodod");
+                            QTimer::singleShot(2000, [=]() { doAutoConnect(/* don't attempt to start ekomodod */ false); });
                         }
                     }
                 } else {
-                    // We tried to start ezcashd previously, and it didn't work. So, show the error. 
-                    main->logger->write("Couldn't start embedded zcashd for unknown reason");
+                    // We tried to start ekomodod previously, and it didn't work. So, show the error. 
+                    main->logger->write("Couldn't start embedded komodod for unknown reason");
                     QString explanation;
                     if (config->zcashDaemon) {
-                        explanation = QString() % QObject::tr("You have zcashd set to start as a daemon, which can cause problems "
-                            "with zec-qt-wallet\n\n."
-                            "Please remove the following line from your zcash.conf and restart zec-qt-wallet\n"
+                        explanation = QString() % QObject::tr("You have komodod set to start as a daemon, which can cause problems "
+                            "with kmd-qt-wallet\n\n."
+                            "Please remove the following line from your komodo.conf and restart kmd-qt-wallet\n"
                             "daemon=1");
                     } else {
-                        explanation = QString() % QObject::tr("Couldn't start the embedded zcashd.\n\n" 
-                            "Please try restarting.\n\nIf you previously started zcashd with custom arguments, you might need to reset zcash.conf.\n\n" 
-                            "If all else fails, please run zcashd manually.") %  
+                        explanation = QString() % QObject::tr("Couldn't start the embedded komodod.\n\n" 
+                            "Please try restarting.\n\nIf you previously started komodod with custom arguments, you might need to reset komodo.conf.\n\n" 
+                            "If all else fails, please run komodod manually.") %  
                             (ezcashd ? QObject::tr("The process returned") + ":\n\n" % ezcashd->errorString() : QString(""));
                     }
                     
                     this->showError(explanation);
                 }                
             } else {
-                // zcash.conf exists, there's no connection, and the user asked us not to start zcashd. Error!
-                main->logger->write("Not using embedded and couldn't connect to zcashd");
-                QString explanation = QString() % QObject::tr("Couldn't connect to zcashd configured in zcash.conf.\n\n" 
-                                      "Not starting embedded zcashd because --no-embedded was passed");
+                // komodo.conf exists, there's no connection, and the user asked us not to start komodod. Error!
+                main->logger->write("Not using embedded and couldn't connect to komodod");
+                QString explanation = QString() % QObject::tr("Couldn't connect to komodod configured in komodo.conf.\n\n" 
+                                      "Not starting embedded komodod because --no-embedded was passed");
                 this->showError(explanation);
             }
         });
     } else {
         if (Settings::getInstance()->useEmbedded()) {
-            // zcash.conf was not found, so create one
+            // komodo.conf was not found, so create one
             createZcashConf();
         } else {
             // Fall back to manual connect
@@ -122,7 +122,7 @@ QString randomPassword() {
 }
 
 /**
- * This will create a new zcash.conf, download Zcash parameters.
+ * This will create a new komodo.conf, download Zcash parameters.
  */ 
 void ConnectionLoader::createZcashConf() {
     main->logger->write("createZcashConf");
@@ -135,19 +135,26 @@ void ConnectionLoader::createZcashConf() {
 
     QFile file(confLocation);
     if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-        main->logger->write("Could not create zcash.conf, returning");
+        main->logger->write("Could not create komodo.conf, returning");
         return;
     }
         
     QTextStream out(&file); 
     
     out << "server=1\n";
-    out << "addnode=mainnet.z.cash\n";
-    out << "rpcuser=zec-qt-wallet\n";
+    out << "txindex=1\n";
+    out << "addnode=5.9.102.210\n";
+    out << "addnode=78.47.196.146\n";
+    out << "addnode=178.63.69.164\n";
+    out << "addnode=88.198.65.74\n";
+    out << "addnode=5.9.122.241\n";
+    out << "addnode=144.76.94.38\n";
+    out << "addnode=89.248.166.91\n";
+    out << "rpcuser=kmd-qt-wallet\n";
     out << "rpcpassword=" % randomPassword() << "\n";
     file.close();
 
-    // Now that zcash.conf exists, try to autoconnect again
+    // Now that komodo.conf exists, try to autoconnect again
     this->doAutoConnect();
 }
 
@@ -261,7 +268,7 @@ bool ConnectionLoader::startEmbeddedZcashd() {
     if (!Settings::getInstance()->useEmbedded()) 
         return false;
     
-    main->logger->write("Trying to start embedded zcashd");
+    main->logger->write("Trying to start embedded komodod");
 
     // Static because it needs to survive even after this method returns.
     static QString processStdErrOutput;
@@ -269,7 +276,7 @@ bool ConnectionLoader::startEmbeddedZcashd() {
     if (ezcashd != nullptr) {
         if (ezcashd->state() == QProcess::NotRunning) {
             if (!processStdErrOutput.isEmpty()) {
-                QMessageBox::critical(main, QObject::tr("zcashd error"), "zcashd said: " + processStdErrOutput, 
+                QMessageBox::critical(main, QObject::tr("komodod error"), "komodod said: " + processStdErrOutput, 
                                       QMessageBox::Ok);
             }
             return false;
@@ -278,42 +285,42 @@ bool ConnectionLoader::startEmbeddedZcashd() {
         }        
     }
 
-    // Finally, start zcashd    
+    // Finally, start komodod    
     QDir appPath(QCoreApplication::applicationDirPath());
 #ifdef Q_OS_LINUX
-    auto zcashdProgram = appPath.absoluteFilePath("zqw-zcashd");
-    if (!QFile(zcashdProgram).exists()) {
-        zcashdProgram = appPath.absoluteFilePath("zcashd");
-    }
+    //auto zcashdProgram = appPath.absoluteFilePath("zqw-komodod");
+    //if (!QFile(zcashdProgram).exists()) {
+    auto zcashdProgram = appPath.absoluteFilePath("komodod");
+    //}
 #elif defined(Q_OS_DARWIN)
-    auto zcashdProgram = appPath.absoluteFilePath("zcashd");
+    auto zcashdProgram = appPath.absoluteFilePath("komodod");
 #else
-    auto zcashdProgram = appPath.absoluteFilePath("zcashd.exe");
+    auto zcashdProgram = appPath.absoluteFilePath("komodod.exe");
 #endif
     
     if (!QFile(zcashdProgram).exists()) {
-        qDebug() << "Can't find zcashd at " << zcashdProgram;
-        main->logger->write("Can't find zcashd at " + zcashdProgram); 
+        qDebug() << "Can't find komodod at " << zcashdProgram;
+        main->logger->write("Can't find komodod at " + zcashdProgram); 
         return false;
     }
 
     ezcashd = new QProcess(main);    
     QObject::connect(ezcashd, &QProcess::started, [=] () {
-        //qDebug() << "zcashd started";
+        //qDebug() << "komodod started";
     });
 
     QObject::connect(ezcashd, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
                         [=](int, QProcess::ExitStatus) {
-        //qDebug() << "zcashd finished with code " << exitCode << "," << exitStatus;    
+        //qDebug() << "komodod finished with code " << exitCode << "," << exitStatus;    
     });
 
     QObject::connect(ezcashd, &QProcess::errorOccurred, [&] (auto) {
-        //qDebug() << "Couldn't start zcashd: " << error;
+        //qDebug() << "Couldn't start komodod: " << error;
     });
 
     QObject::connect(ezcashd, &QProcess::readyReadStandardError, [=]() {
         auto output = ezcashd->readAllStandardError();
-       main->logger->write("zcashd stderr:" + output);
+       main->logger->write("komodod stderr:" + output);
         processStdErrOutput.append(output);
     });
 
@@ -323,7 +330,7 @@ bool ConnectionLoader::startEmbeddedZcashd() {
     ezcashd->start(zcashdProgram);
 #else
     ezcashd->setWorkingDirectory(appPath.absolutePath());
-    ezcashd->start("zcashd.exe");
+    ezcashd->start("komodod.exe");
 #endif // Q_OS_LINUX
 
 
@@ -348,7 +355,7 @@ void ConnectionLoader::doManualConnect() {
     auto connection = makeConnection(config);
     refreshZcashdState(connection, [=] () {
         QString explanation = QString()
-                % QObject::tr("Could not connect to zcashd configured in settings.\n\n" 
+                % QObject::tr("Could not connect to komodod configured in settings.\n\n" 
                 "Please set the host/port and user/password in the Edit->Settings menu.");
 
         showError(explanation);
@@ -409,7 +416,7 @@ void ConnectionLoader::refreshZcashdState(Connection* connection, std::function<
                 main->logger->write("Authentication failed");
                 QString explanation = QString() % 
                         QObject::tr("Authentication failed. The username / password you specified was "
-                        "not accepted by zcashd. Try changing it in the Edit->Settings menu");
+                        "not accepted by komodod. Try changing it in the Edit->Settings menu");
 
                 this->showError(explanation);
             } else if (err == QNetworkReply::NetworkError::InternalServerError && 
@@ -423,8 +430,8 @@ void ConnectionLoader::refreshZcashdState(Connection* connection, std::function<
                     if (dots > 3)
                         dots = 0;
                 }
-                this->showInformation(QObject::tr("Your zcashd is starting up. Please wait."), status);
-                main->logger->write("Waiting for zcashd to come online.");
+                this->showInformation(QObject::tr("Your komodod is starting up. Please wait."), status);
+                main->logger->write("Waiting for komodod to come online.");
                 // Refresh after one second
                 QTimer::singleShot(1000, [=]() { this->refreshZcashdState(connection, refused); });
             }
@@ -450,11 +457,11 @@ void ConnectionLoader::showError(QString explanation) {
 
 QString ConnectionLoader::locateZcashConfFile() {
 #ifdef Q_OS_LINUX
-    auto confLocation = QStandardPaths::locate(QStandardPaths::HomeLocation, ".zcash/zcash.conf");
+    auto confLocation = QStandardPaths::locate(QStandardPaths::HomeLocation, ".komodo/komodo.conf");
 #elif defined(Q_OS_DARWIN)
-    auto confLocation = QStandardPaths::locate(QStandardPaths::HomeLocation, "Library/Application Support/Zcash/zcash.conf");
+    auto confLocation = QStandardPaths::locate(QStandardPaths::HomeLocation, "Library/Application Support/Komodo/komodo.conf");
 #else
-    auto confLocation = QStandardPaths::locate(QStandardPaths::AppDataLocation, "../../Zcash/zcash.conf");
+    auto confLocation = QStandardPaths::locate(QStandardPaths::AppDataLocation, "../../Komodo/komodo.conf");
 #endif
 
     main->logger->write("Found zcashconf at " + QDir::cleanPath(confLocation));
@@ -463,11 +470,11 @@ QString ConnectionLoader::locateZcashConfFile() {
 
 QString ConnectionLoader::zcashConfWritableLocation() {
 #ifdef Q_OS_LINUX
-    auto confLocation = QDir(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)).filePath(".zcash/zcash.conf");
+    auto confLocation = QDir(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)).filePath(".komodo/komodo.conf");
 #elif defined(Q_OS_DARWIN)
-    auto confLocation = QDir(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)).filePath("Library/Application Support/Zcash/zcash.conf");
+    auto confLocation = QDir(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)).filePath("Library/Application Support/Komodo/komodo.conf");
 #else
-    auto confLocation = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).filePath("../../Zcash/zcash.conf");
+    auto confLocation = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).filePath("../../Komodo/komodo.conf");
 #endif
 
     main->logger->write("Found zcashconf at " + QDir::cleanPath(confLocation));
@@ -505,7 +512,7 @@ bool ConnectionLoader::verifyParams() {
 }
 
 /**
- * Try to automatically detect a zcash.conf file in the correct location and load parameters
+ * Try to automatically detect a komodo.conf file in the correct location and load parameters
  */ 
 std::shared_ptr<ConnectionConfig> ConnectionLoader::autoDetectZcashConf() {    
     auto confLocation = locateZcashConfFile();
@@ -556,21 +563,21 @@ std::shared_ptr<ConnectionConfig> ConnectionLoader::autoDetectZcashConf() {
         if (name == "testnet" &&
             value == "1"  &&
             zcashconf->port.isEmpty()) {
-                zcashconf->port = "18232";
+                zcashconf->port = "17771";
         }
     }
 
     // If rpcport is not in the file, and it was not set by the testnet=1 flag, then go to default
-    if (zcashconf->port.isEmpty()) zcashconf->port = "8232";
+    if (zcashconf->port.isEmpty()) zcashconf->port = "7771";
     file.close();
 
-    // In addition to the zcash.conf file, also double check the params. 
+    // In addition to the komodo.conf file, also double check the params. 
 
     return std::shared_ptr<ConnectionConfig>(zcashconf);
 }
 
 /**
- * Load connection settings from the UI, which indicates an unknown, external zcashd
+ * Load connection settings from the UI, which indicates an unknown, external komodod
  */ 
 std::shared_ptr<ConnectionConfig> ConnectionLoader::loadFromSettings() {
     // Load from the QT Settings. 

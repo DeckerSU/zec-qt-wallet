@@ -278,6 +278,14 @@ void RPC::getAllPrivKeys(const std::function<void(QList<QPair<QString, QString>>
                 [=] (QMap<QString, json>* privkeys) {
                     QList<QPair<QString, QString>> allTKeys;
                     for (QString addr: privkeys->keys()) {
+                        // we receive list of addresses via getaddressesbyaccount, due to specific
+                        // of addressbookdata this method can return addresses that not belongs to
+                        // our wallet, for example, addresses which used for send purposes. of course
+                        // we haven't privkeys for it and we need some error handling when daemon
+                        // returns error and message "Private key for address %s is not known",
+                        // otherwise parsing dumpprivkey here will cause crash, bcz string as result
+                        // is expected
+                        if (privkeys->value(addr).is_string())
                         allTKeys.push_back(
                             QPair<QString, QString>(
                                 addr, 

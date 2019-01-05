@@ -49,6 +49,7 @@ public:
     bool    isSaplingActive();
 
     void    setUsingZcashConf(QString confLocation);
+    void    clearZcashdConfLocation();
     const   QString& getZcashdConfLocation() { return _confLocation; }
 
     void    setZECPrice(double p) { zecPrice = p; }

@@ -38,6 +38,23 @@ void ConnectionLoader::doAutoConnect(bool tryEzcashdStart) {
 
     // Priority 2: Try to connect to detect komodo.conf and connect to it.
     auto config = autoDetectZcashConf();
+
+    // small logic change: if --no-embedded passed we shouldn't use rpc connection
+    // data from exising .conf, instead of that we read settings from QSettings (!)
+    // and do manual connection. Settings is stored in platform-specific locations:
+    // http://doc.qt.io/qt-5/qsettings.html#platform-specific-notes . Also there is
+    // a various formats http://doc.qt.io/qt-5/qsettings.html#Format-enum to store
+    // settings .
+
+    // For Windows 64-bit default location for Settings is system registry, default
+    // key is HKEY_CURRENT_USER\Software\kmd-qt-wallet-org , so to delete all settings
+    // you just need to do something like "reg delete HKEY_CURRENT_USER\Software\kmd-qt-wallet-org"
+
+    if (Settings::getInstance()->useEmbedded() == false) {
+         config = nullptr; // std::shared_ptr<ConnectionConfig>
+         Settings::getInstance()->clearZcashdConfLocation();
+    }
+
     main->logger->write(QObject::tr("Attempting autoconnect"));
 
     if (config.get() != nullptr) {

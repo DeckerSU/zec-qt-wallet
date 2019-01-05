@@ -1,3 +1,15 @@
+## kmd-qt-wallet  ##
+
+[kmd-qt-wallet](https://github.com/DeckerSU/zec-qt-wallet/tree/komodo) is a fork of [zec-qt-wallet](https://github.com/ZcashFoundation/zec-qt-wallet) adopted for using with KMD daemon (komodod). it's not a full-node itself, it's just a Qt GUI that interacts with komodo daemon (komodod) via RPC calls.
+
+kmd-qt-wallet used `z_sendmany` for every transaction (t->z, z->t, t->t), as a result when you trying to send funds from your t-address to the same address - no rewards (interest) will be received. As a result you **can't claim interest (rewards)** using this software. But it's very handy anyway.
+
+Installation and compile steps is same as described in zec-qt-wallet section, make sure that you use correct branch for komodo.
+
+_PS: kmd-qt-wallet is NOT an official wallet, and is not affiliated with the Komodo / KomodoPlatform in any way._
+
+## zec-qt-wallet  ##
+
 zec-qt-wallet is a z-Addr first, Sapling compatible wallet and full node for zcashd that runs on Linux, Windows and macOS.
 
 ![Screenshot](docs/screenshot-main.png?raw=true)

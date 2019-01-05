@@ -337,10 +337,10 @@ void MainWindow::setupStatusBar() {
             menu.addAction("View tx on block explorer", [=]() {
                 QString url;
                 if (Settings::getInstance()->isTestnet()) {
-                    url = "https://explorer.testnet.z.cash/tx/" + txid;
+                    url = "https://kmdexplorer.io/tx/" + txid;
                 }
                 else {
-                    url = "https://explorer.zcha.in/transactions/" + txid;
+                    url = "https://kmdexplorer.io/tx/" + txid;
                 }
                 QDesktopServices::openUrl(QUrl(url));
             });
@@ -894,9 +894,9 @@ void MainWindow::setupBalancesTab() {
             menu.addAction(tr("View on block explorer"), [=] () {
                 QString url;
                 if (Settings::getInstance()->isTestnet()) {
-                    url = "https://explorer.testnet.z.cash/address/" + addr;
+                    url = "https://kmdexplorer.io/address/" + addr;
                 } else {
-                    url = "https://explorer.zcha.in/accounts/" + addr;
+                    url = "https://kmdexplorer.io/address/" + addr;
                 }
                 QDesktopServices::openUrl(QUrl(url));
             });
@@ -957,9 +957,9 @@ void MainWindow::setupTransactionsTab() {
         menu.addAction(tr("View on block explorer"), [=] () {
             QString url;
             if (Settings::getInstance()->isTestnet()) {
-                url = "https://explorer.testnet.z.cash/tx/" + txid;
+                url = "https://kmdexplorer.io/tx/" + txid;
             } else {
-                url = "https://explorer.zcha.in/transactions/" + txid;
+                url = "https://kmdexplorer.io/tx/" + txid;
             }
             QDesktopServices::openUrl(QUrl(url));
         });

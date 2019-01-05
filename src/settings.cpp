@@ -102,8 +102,9 @@ void Settings::setBlockNumber(int number) {
 }
 
 bool Settings::isSaplingActive() {
-    return  (isTestnet() && getBlockNumber() > 280000) ||
-           (!isTestnet() && getBlockNumber() > 419200);
+    /*return  (isTestnet() && getBlockNumber() > 280000) ||
+           (!isTestnet() && getBlockNumber() > 419200);*/
+    return true;
 }
 
 double Settings::getZECPrice() { 

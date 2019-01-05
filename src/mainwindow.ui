@@ -1082,6 +1082,9 @@
    </property>
   </action>
   <action name="actionz_board_net">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;z-board.net</string>
    </property>

@@ -21,18 +21,20 @@ Config Settings::getSettings() {
     auto host        = s.value("connection/host").toString();
     auto port        = s.value("connection/port").toString();
     auto username    = s.value("connection/rpcuser").toString();
-    auto password    = s.value("connection/rpcpassword").toString();    
+    auto password    = s.value("connection/rpcpassword").toString();
+    auto assetchain  = s.value("connection/assetchain").toString();
 
-    return Config{host, port, username, password};
+    return Config{host, port, username, password, assetchain};
 }
 
-void Settings::saveSettings(const QString& host, const QString& port, const QString& username, const QString& password) {
+void Settings::saveSettings(const QString& host, const QString& port, const QString& username, const QString& password, const QString& assetchain) {
     QSettings s;
 
     s.setValue("connection/host", host);
     s.setValue("connection/port", port);
     s.setValue("connection/rpcuser", username);
     s.setValue("connection/rpcpassword", password);
+    s.setValue("connection/assetchain", assetchain);
 
     s.sync();
 
@@ -46,6 +48,12 @@ void Settings::clearZcashdConfLocation() {
 void Settings::setUsingZcashConf(QString confLocation) {
     if (!confLocation.isEmpty())
         _confLocation = confLocation;
+}
+
+void Settings::setAssetChainName(QString token) {
+    if (!token.isEmpty()) {
+        _assetchainName = token;
+    } else _assetchainName = "KMD";
 }
 
 bool Settings::isTestnet() {
@@ -191,10 +199,11 @@ QString Settings::getZECUSDDisplayFormat(double bal) {
 const QString Settings::txidStatusMessage = QString(QObject::tr("Tx submitted (right click to copy) txid:"));
 
 QString Settings::getTokenName() {
+
     if (Settings::getInstance()->isTestnet()) {
         return "TAZ";
     } else {
-        return "KMD";
+        return Settings::getInstance()->getAssetChainName();
     }
 }
 

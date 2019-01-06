@@ -8,9 +8,10 @@
 
 using json = nlohmann::json;
 
-ConnectionLoader::ConnectionLoader(MainWindow* main, RPC* rpc) {
+ConnectionLoader::ConnectionLoader(MainWindow* main, RPC* rpc, QString _ac_name) {
     this->main = main;
     this->rpc  = rpc;
+    this->ac_name = _ac_name.isEmpty() ? "" : _ac_name.toUpper();
 
     d = new QDialog(main);
     connD = new Ui_ConnectionDialog();
@@ -22,6 +23,16 @@ ConnectionLoader::ConnectionLoader(MainWindow* main, RPC* rpc) {
 ConnectionLoader::~ConnectionLoader() {    
     delete d;
     delete connD;
+}
+
+
+std::shared_ptr<ConnectionConfig> ConnectionLoader::getConnectionConfig() {
+
+    auto config = autoDetectZcashConf(); // std::shared_ptr<ConnectionConfig>
+     if (config.get() != nullptr) {
+        return config;
+     }
+    return nullptr;
 }
 
 void ConnectionLoader::loadConnection() {
@@ -473,12 +484,13 @@ void ConnectionLoader::showError(QString explanation) {
 }
 
 QString ConnectionLoader::locateZcashConfFile() {
+bool isKMD = this->ac_name.isEmpty() || !QString::compare(this->ac_name, "KMD", Qt::CaseInsensitive);
 #ifdef Q_OS_LINUX
-    auto confLocation = QStandardPaths::locate(QStandardPaths::HomeLocation, ".komodo/komodo.conf");
+    auto confLocation = QStandardPaths::locate(QStandardPaths::HomeLocation, ".komodo/" + (isKMD ? "komodo.conf" : this->ac_name + "/" + this->ac_name + ".conf"));
 #elif defined(Q_OS_DARWIN)
-    auto confLocation = QStandardPaths::locate(QStandardPaths::HomeLocation, "Library/Application Support/Komodo/komodo.conf");
+    auto confLocation = QStandardPaths::locate(QStandardPaths::HomeLocation, "Library/Application Support/Komodo/" + (isKMD ? "komodo.conf" : this->ac_name + "/" + this->ac_name + ".conf"));
 #else
-    auto confLocation = QStandardPaths::locate(QStandardPaths::AppDataLocation, "../../Komodo/komodo.conf");
+    auto confLocation = QStandardPaths::locate(QStandardPaths::AppDataLocation, "../../Komodo/" + (isKMD ? "komodo.conf" : this->ac_name + "/" + this->ac_name + ".conf"));
 #endif
 
     main->logger->write("Found zcashconf at " + QDir::cleanPath(confLocation));
@@ -486,12 +498,13 @@ QString ConnectionLoader::locateZcashConfFile() {
 }
 
 QString ConnectionLoader::zcashConfWritableLocation() {
+bool isKMD = this->ac_name.isEmpty() || !QString::compare(this->ac_name, "KMD", Qt::CaseInsensitive);
 #ifdef Q_OS_LINUX
-    auto confLocation = QDir(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)).filePath(".komodo/komodo.conf");
+    auto confLocation = QDir(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)).filePath(".komodo/" + (isKMD ? "komodo.conf" : this->ac_name + "/" + this->ac_name + ".conf"));
 #elif defined(Q_OS_DARWIN)
-    auto confLocation = QDir(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)).filePath("Library/Application Support/Komodo/komodo.conf");
+    auto confLocation = QDir(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)).filePath("Library/Application Support/Komodo/" + (isKMD ? "komodo.conf" : this->ac_name + "/" + this->ac_name + ".conf"));
 #else
-    auto confLocation = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).filePath("../../Komodo/komodo.conf");
+    auto confLocation = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).filePath("../../Komodo/" + (isKMD ? "komodo.conf" : this->ac_name + "/" + this->ac_name + ".conf"));
 #endif
 
     main->logger->write("Found zcashconf at " + QDir::cleanPath(confLocation));

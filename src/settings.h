@@ -8,6 +8,7 @@ struct Config {
     QString port;
     QString rpcuser;
     QString rpcpassword;
+    QString assetchain;
 };
 
 struct ToFields;
@@ -20,7 +21,7 @@ public:
     static  Settings* getInstance();
 
     Config  getSettings();
-    void    saveSettings(const QString& host, const QString& port, const QString& username, const QString& password);
+    void    saveSettings(const QString& host, const QString& port, const QString& username, const QString& password, const QString& assetchain);
 
     bool    isTestnet();
     void    setTestnet(bool isTestnet);
@@ -51,6 +52,9 @@ public:
     void    setUsingZcashConf(QString confLocation);
     void    clearZcashdConfLocation();
     const   QString& getZcashdConfLocation() { return _confLocation; }
+
+    void    setAssetChainName(QString token);
+    const   QString& getAssetChainName() { return _assetchainName; }
 
     void    setZECPrice(double p) { zecPrice = p; }
     double  getZECPrice();
@@ -103,6 +107,8 @@ private:
     int     _blockNumber      = 0;
     bool    _useEmbedded      = false;
     int     _peerConnections  = 0;
+    QString _assetchainName = "";
+
     double zecPrice = 0.0;
 };
 

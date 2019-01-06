@@ -384,6 +384,42 @@ void MainWindow::setupSettingsModal() {
             }
         });
 
+        // when assetchain combobox selection changed
+        QObject::connect(settings.assetchainsComboBox, &QComboBox::currentTextChanged, [=]() {
+
+            auto zcashConfLocation = Settings::getInstance()->getZcashdConfLocation();
+            if (!zcashConfLocation.isEmpty()) return;
+
+            QString ac_name = settings.assetchainsComboBox->currentText();
+
+            if (!ac_name.isEmpty()) {
+                qDebug() << "Reading settings for " + ac_name + "";
+                auto cl = new ConnectionLoader(this, rpc, ac_name);
+                auto config = cl->getConnectionConfig();
+                if (config.get() != nullptr) {
+                    settings.hostname->setText(config->host);
+                    settings.port->setText(config->port);
+                    settings.rpcuser->setText(config->rpcuser);
+                    settings.rpcpassword->setText(config->rpcpassword);
+                    settings.confMsg->setText("Settings for " + ac_name + " readed succesfully");
+
+                } else {
+                    settings.hostname->clear();
+                    settings.port->clear();
+                    settings.rpcuser->clear();
+                    settings.rpcpassword->clear();
+                    settings.confMsg->setText("Failed to read settings for " + ac_name);
+                }
+
+                if (Settings::getInstance()->useEmbedded() == false) {
+                    config = nullptr;
+                    Settings::getInstance()->clearZcashdConfLocation();
+                }
+            }
+        });
+
+
+
         // Save sent transactions
         settings.chkSaveTxs->setChecked(Settings::getInstance()->getSaveZtxs());
 
@@ -413,12 +449,18 @@ void MainWindow::setupSettingsModal() {
 
         // If values are coming from komodo.conf, then disable all the fields
         auto zcashConfLocation = Settings::getInstance()->getZcashdConfLocation();
+
         if (!zcashConfLocation.isEmpty()) {
             settings.confMsg->setText("Settings are being read from \n" + zcashConfLocation);
             settings.hostname->setEnabled(false);
             settings.port->setEnabled(false);
             settings.rpcuser->setEnabled(false);
             settings.rpcpassword->setEnabled(false);
+            settings.assetchainsGroupBox->setEnabled(false);
+            settings.assetchainsLabel->setEnabled(false);
+
+            Settings::getInstance()->setAssetChainName("KMD");
+
         }
         else {
             // Load current values into the dialog        
@@ -428,15 +470,58 @@ void MainWindow::setupSettingsModal() {
             settings.rpcuser->setText(conf.rpcuser);
             settings.rpcpassword->setText(conf.rpcpassword);
 
+            Settings::getInstance()->setAssetChainName(conf.assetchain);
+
             settings.confMsg->setText("No local komodo.conf found. Please configure connection manually.");
             settings.hostname->setEnabled(true);
             settings.port->setEnabled(true);
             settings.rpcuser->setEnabled(true);
             settings.rpcpassword->setEnabled(true);
+            settings.assetchainsGroupBox->setEnabled(true);
+            settings.assetchainsLabel->setEnabled(true);
         }
 
         // Connection tab by default
         settings.tabWidget->setCurrentIndex(0);
+
+        // Assetchains settings setup
+
+        if (zcashConfLocation.isEmpty()) {
+            QString assetchainsJSONfname = "assetchains.json";
+            QString assetchainsJSONlocation = QCoreApplication::applicationDirPath() + "/" + assetchainsJSONfname;
+            QFile assetchainsJSON(assetchainsJSONlocation);
+            QStringList assetchains_names;
+            assetchains_names << "KMD";
+
+            settings.assetchainsComboBox->clear();
+
+            if (assetchainsJSON.exists()) {
+                settings.assetchainsLabel->setText("Found " + assetchainsJSONfname /*+ " at " + QDir::cleanPath(assetchainsJSONlocation)*/);
+                QTextStream in(&assetchainsJSON);
+                if (assetchainsJSON.open(QFile::ReadOnly | QFile::Text)) {
+                    auto j = json::parse(in.readAll().toStdString(), nullptr, false);
+                    if (!j.is_discarded()) {
+                        for (const json& item : j.get<json::array_t>()) {
+                            assetchains_names <<  QString::fromStdString(item["ac_name"].get<json::string_t>());
+                        }
+
+                        settings.assetchainsComboBox->addItems(assetchains_names);
+
+                        QString assetchain = Settings::getInstance()->getSettings().assetchain;
+                        if (!assetchain.isEmpty()) settings.assetchainsComboBox->setCurrentText(assetchain);
+
+                    } else settings.assetchainsLabel->setText("error parsing " + assetchainsJSONfname);
+                    assetchainsJSON.close();
+                } else settings.assetchainsLabel->setText("can't read " + assetchainsJSONfname);
+            } else settings.assetchainsLabel->setText(assetchainsJSONfname + " not found");
+
+        } else {
+
+            QStringList assetchains_names;
+            assetchains_names << "KMD";
+            settings.assetchainsComboBox->addItems(assetchains_names);
+            settings.assetchainsLabel->setText("");
+        }
 
         if (settingsDialog.exec() == QDialog::Accepted) {
             // Custom fees
@@ -470,15 +555,24 @@ void MainWindow::setupSettingsModal() {
 
             if (zcashConfLocation.isEmpty()) {
                 // Save settings
+
+                QString ac_name = settings.assetchainsComboBox->currentText();
+
                 Settings::getInstance()->saveSettings(
                     settings.hostname->text(),
                     settings.port->text(),
                     settings.rpcuser->text(),
-                    settings.rpcpassword->text());
-                
+                    settings.rpcpassword->text(),
+                    ac_name);
+
+                Settings::getInstance()->setAssetChainName(ac_name);
+
                 auto cl = new ConnectionLoader(this, rpc);
                 cl->loadConnection();
             }
+
+        } else {
+            // in case of settings dialog rejected or closed
         }
     });
 }

@@ -33,10 +33,11 @@ class Connection;
 class ConnectionLoader {
 
 public:
-    ConnectionLoader(MainWindow* main, RPC* rpc);
+    ConnectionLoader(MainWindow* main, RPC* rpc, QString _ac_name = "");
     ~ConnectionLoader();
 
     void loadConnection();
+    std::shared_ptr<ConnectionConfig> getConnectionConfig();
 
 private:
     std::shared_ptr<ConnectionConfig> autoDetectZcashConf();
@@ -78,6 +79,8 @@ private:
 
     QNetworkAccessManager* client  = nullptr; 
     QTime downloadTime;
+
+    QString ac_name;
 };
 
 /**

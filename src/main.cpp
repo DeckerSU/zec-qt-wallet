@@ -41,6 +41,8 @@ int main(int argc, char *argv[])
 
     Settings::init();
 
+    //Settings::getInstance()->setAssetChainName("KMD");
+
     if (argc >= 2 && QString::fromStdString(argv[1]) == "--no-embedded") {
         Settings::getInstance()->setUseEmbedded(false);
     } else {

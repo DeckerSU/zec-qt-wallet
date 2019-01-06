@@ -50,7 +50,7 @@ public:
     bool    isSaplingActive();
 
     void    setUsingZcashConf(QString confLocation);
-    void    clearZcashdConfLocation();
+    //void    clearZcashdConfLocation();
     const   QString& getZcashdConfLocation() { return _confLocation; }
 
     void    setAssetChainName(QString token);

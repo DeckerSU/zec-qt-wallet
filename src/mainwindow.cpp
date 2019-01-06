@@ -388,7 +388,7 @@ void MainWindow::setupSettingsModal() {
         QObject::connect(settings.assetchainsComboBox, &QComboBox::currentTextChanged, [=]() {
 
             auto zcashConfLocation = Settings::getInstance()->getZcashdConfLocation();
-            if (!zcashConfLocation.isEmpty()) return;
+            if (!zcashConfLocation.isEmpty() && Settings::getInstance()->useEmbedded()) return;
 
             QString ac_name = settings.assetchainsComboBox->currentText();
 
@@ -413,7 +413,7 @@ void MainWindow::setupSettingsModal() {
 
                 if (Settings::getInstance()->useEmbedded() == false) {
                     config = nullptr;
-                    Settings::getInstance()->clearZcashdConfLocation();
+                    //Settings::getInstance()->clearZcashdConfLocation();
                 }
             }
         });
@@ -450,7 +450,7 @@ void MainWindow::setupSettingsModal() {
         // If values are coming from komodo.conf, then disable all the fields
         auto zcashConfLocation = Settings::getInstance()->getZcashdConfLocation();
 
-        if (!zcashConfLocation.isEmpty()) {
+        if (!zcashConfLocation.isEmpty() && Settings::getInstance()->useEmbedded()) {
             settings.confMsg->setText("Settings are being read from \n" + zcashConfLocation);
             settings.hostname->setEnabled(false);
             settings.port->setEnabled(false);
@@ -486,7 +486,7 @@ void MainWindow::setupSettingsModal() {
 
         // Assetchains settings setup
 
-        if (zcashConfLocation.isEmpty()) {
+        if (zcashConfLocation.isEmpty() || !Settings::getInstance()->useEmbedded()) {
             QString assetchainsJSONfname = "assetchains.json";
             QString assetchainsJSONlocation = QCoreApplication::applicationDirPath() + "/" + assetchainsJSONfname;
             QFile assetchainsJSON(assetchainsJSONlocation);
@@ -553,7 +553,7 @@ void MainWindow::setupSettingsModal() {
                     QMessageBox::Ok);
             }
 
-            if (zcashConfLocation.isEmpty()) {
+            if (zcashConfLocation.isEmpty() || !Settings::getInstance()->useEmbedded()) {
                 // Save settings
 
                 QString ac_name = settings.assetchainsComboBox->currentText();

@@ -61,9 +61,8 @@ void ConnectionLoader::doAutoConnect(bool tryEzcashdStart) {
     // key is HKEY_CURRENT_USER\Software\kmd-qt-wallet-org , so to delete all settings
     // you just need to do something like "reg delete HKEY_CURRENT_USER\Software\kmd-qt-wallet-org"
 
-    if (Settings::getInstance()->useEmbedded() == false) {
-         config = nullptr; // std::shared_ptr<ConnectionConfig>
-         Settings::getInstance()->clearZcashdConfLocation();
+    if (!Settings::getInstance()->useEmbedded()) {
+         config = nullptr;
     }
 
     main->logger->write(QObject::tr("Attempting autoconnect"));

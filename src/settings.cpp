@@ -42,9 +42,12 @@ void Settings::saveSettings(const QString& host, const QString& port, const QStr
     init();
 }
 
+/*
 void Settings::clearZcashdConfLocation() {
     _confLocation = "";
 }
+*/
+
 void Settings::setUsingZcashConf(QString confLocation) {
     if (!confLocation.isEmpty())
         _confLocation = confLocation;

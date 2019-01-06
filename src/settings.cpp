@@ -142,7 +142,7 @@ void Settings::setAllowCustomFees(bool allow) {
 
 bool Settings::getSaveZtxs() {
     // Load from the QT Settings. 
-    return QSettings().value("options/savesenttx", true).toBool();
+    return QSettings().value("options/savesenttx", false).toBool();
 }
 
 void Settings::setSaveZtxs(bool save) {

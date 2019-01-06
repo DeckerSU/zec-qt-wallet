@@ -93,7 +93,7 @@ bool Settings::isTAddress(QString addr) {
     if (!isValidAddress(addr))
         return false;
         
-    return addr.startsWith("t");
+    return addr.startsWith("R");
 }
 
 bool Settings::isSyncing() {

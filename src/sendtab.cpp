@@ -125,7 +125,7 @@ void MainWindow::setDefaultPayFrom() {
     if (maxZ >= 0) {
         ui->inputsCombo->setCurrentIndex(maxZ);                
     } else {
-        auto maxT = findMax("t");
+        auto maxT = findMax("R");
         maxT  = maxT >= 0 ? maxT : 0;
         ui->inputsCombo->setCurrentIndex(maxT);
     }

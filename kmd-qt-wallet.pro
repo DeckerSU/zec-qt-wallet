@@ -96,7 +96,7 @@ win32: RC_ICONS = res/icon.ico
 ICON = res/logo.icns
 
 
-# copy data folder into build directory
+# copy assetchains.json into build directory
 
 CONFIG(debug, debug|release) {
     DESTDIR = debug
@@ -104,7 +104,7 @@ CONFIG(debug, debug|release) {
     DESTDIR = release
 }
 
-copydata.commands = $(COPY_DIR) $$shell_path($$PWD/data) $$shell_path($$OUT_PWD/$$DESTDIR)
+copydata.commands = $(COPY_FILE) $$shell_path($$PWD/data/assetchains.json) $$shell_path($$OUT_PWD/$$DESTDIR)
 first.depends = $(first) copydata
 export(first.depends)
 export(copydata.commands)

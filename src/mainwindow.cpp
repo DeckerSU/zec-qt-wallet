@@ -335,12 +335,21 @@ void MainWindow::setupStatusBar() {
                 QGuiApplication::clipboard()->setText(txid);
             });
             menu.addAction("View tx on block explorer", [=]() {
+                QString ac_name = Settings::getTokenName().toLower();
+                bool isKMD = ac_name.isEmpty() || !QString::compare(ac_name, "KMD", Qt::CaseInsensitive);
+
                 QString url;
                 if (Settings::getInstance()->isTestnet()) {
-                    url = "https://kmdexplorer.io/tx/" + txid;
+                    if (isKMD)
+                        url = "https://kmdexplorer.io/tx/" + txid;
+                    else
+                        url = "https://" + ac_name + "." + "kmdexplorer.io/tx/" + txid;
                 }
                 else {
-                    url = "https://kmdexplorer.io/tx/" + txid;
+                    if (isKMD)
+                        url = "https://kmdexplorer.io/tx/" + txid;
+                    else
+                        url = "https://" + ac_name + "." + "kmdexplorer.io/tx/" + txid;
                 }
                 QDesktopServices::openUrl(QUrl(url));
             });
@@ -986,11 +995,21 @@ void MainWindow::setupBalancesTab() {
             }
 
             menu.addAction(tr("View on block explorer"), [=] () {
+                QString ac_name = Settings::getTokenName().toLower();
+                bool isKMD = ac_name.isEmpty() || !QString::compare(ac_name, "KMD", Qt::CaseInsensitive);
+
                 QString url;
                 if (Settings::getInstance()->isTestnet()) {
-                    url = "https://kmdexplorer.io/address/" + addr;
-                } else {
-                    url = "https://kmdexplorer.io/address/" + addr;
+                    if (isKMD)
+                        url = "https://kmdexplorer.io/address/" + addr;
+                    else
+                        url = "https://" + ac_name + "." + "kmdexplorer.io/address/" + addr;
+                }
+                else {
+                    if (isKMD)
+                        url = "https://kmdexplorer.io/address/" + addr;
+                    else
+                        url = "https://" + ac_name + "." + "kmdexplorer.io/address/" + addr;
                 }
                 QDesktopServices::openUrl(QUrl(url));
             });
@@ -1048,12 +1067,22 @@ void MainWindow::setupTransactionsTab() {
             });
         }
 
-        menu.addAction(tr("View on block explorer"), [=] () {
+        menu.addAction("View tx on block explorer", [=]() {
+            QString ac_name = Settings::getTokenName().toLower();
+            bool isKMD = ac_name.isEmpty() || !QString::compare(ac_name, "KMD", Qt::CaseInsensitive);
+
             QString url;
             if (Settings::getInstance()->isTestnet()) {
-                url = "https://kmdexplorer.io/tx/" + txid;
-            } else {
-                url = "https://kmdexplorer.io/tx/" + txid;
+                if (isKMD)
+                    url = "https://kmdexplorer.io/tx/" + txid;
+                else
+                    url = "https://" + ac_name + "." + "kmdexplorer.io/tx/" + txid;
+            }
+            else {
+                if (isKMD)
+                    url = "https://kmdexplorer.io/tx/" + txid;
+                else
+                    url = "https://" + ac_name + "." + "kmdexplorer.io/tx/" + txid;
             }
             QDesktopServices::openUrl(QUrl(url));
         });

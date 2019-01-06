@@ -6,6 +6,8 @@ kmd-qt-wallet used `z_sendmany` for every transaction (t->z, z->t, t->t), as a r
 
 Installation and compile steps is same as described in zec-qt-wallet section, make sure that you use correct branch for komodo.
 
+![Remotenode](docs/remote_node.png?raw=true)
+
 _PS: kmd-qt-wallet is NOT an official wallet, and is not affiliated with the Komodo / KomodoPlatform in any way._
 
 ## zec-qt-wallet  ##

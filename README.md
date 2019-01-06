@@ -8,6 +8,8 @@ Installation and compile steps is same as described in zec-qt-wallet section, ma
 
 ![Remotenode](docs/remote_node.png?raw=true)
 
+Coin (assetchain) selection in Settings menu (Ctrl-P) will be available if you start kmd-qt-wallet with `--no-embedded` arg. More info available here - [Connecting to a remote zcashd](https://github.com/ZcashFoundation/zec-qt-wallet/wiki/Troubleshooting-&-FAQ#4-connecting-to-a-remote-zcashd).
+
 _PS: kmd-qt-wallet is NOT an official wallet, and is not affiliated with the Komodo / KomodoPlatform in any way._
 
 ## zec-qt-wallet  ##

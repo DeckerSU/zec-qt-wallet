@@ -911,7 +911,7 @@ void RPC::watchTxStatus() {
     });
 }
 
-// Get the KMD->USD price from coinmarketcap using their API
+// Get the TOKEN->USD price from coinmarketcap using their API
 void RPC::refreshZECPrice() {
     if  (conn == nullptr) 
         return noConnection();
@@ -946,8 +946,10 @@ void RPC::refreshZECPrice() {
                 return;
             }
 
+            QString ac_name = Settings::getTokenName().toUpper();
+
             for (const json& item : parsed.get<json::array_t>()) {
-                if (item["symbol"].get<json::string_t>() == "KMD") {
+                if (item["symbol"].get<json::string_t>() == ac_name.toStdString()) {
                     QString price = QString::fromStdString(item["price_usd"].get<json::string_t>());
                     qDebug() << "ZEC Price=" << price;
                     Settings::getInstance()->setZECPrice(price.toDouble());

@@ -144,7 +144,7 @@
        <item>
         <widget class="QGroupBox" name="assetchainsGroupBox">
          <property name="title">
-          <string>Assetchains Parameters</string>
+          <string>Coin:</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout" stretch="1">
           <item>

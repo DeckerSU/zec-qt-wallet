@@ -41,12 +41,20 @@ int main(int argc, char *argv[])
 
     Settings::init();
 
-    //Settings::getInstance()->setAssetChainName("KMD");
-
     if (argc >= 2 && QString::fromStdString(argv[1]) == "--no-embedded") {
         Settings::getInstance()->setUseEmbedded(false);
     } else {
         Settings::getInstance()->setUseEmbedded(true);
+    }
+
+    /* set main token name from previously saved settings if we use --no-embedded
+     * or just set it to KMD if we used main komodo.conf */
+
+    if (!Settings::getInstance()->useEmbedded()) {
+        auto conf = Settings::getInstance()->getSettings();
+        Settings::getInstance()->setAssetChainName(conf.assetchain);
+    } else {
+        Settings::getInstance()->setAssetChainName("KMD");
     }
 
     MainWindow w;

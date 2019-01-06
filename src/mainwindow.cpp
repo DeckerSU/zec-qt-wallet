@@ -401,7 +401,8 @@ void MainWindow::setupSettingsModal() {
                     settings.port->setText(config->port);
                     settings.rpcuser->setText(config->rpcuser);
                     settings.rpcpassword->setText(config->rpcpassword);
-                    settings.confMsg->setText("Settings for " + ac_name + " readed succesfully");
+                    settings.confMsg->setText("Settings for " + ac_name + " are being read from \n"
+                                              + Settings::getInstance()->getZcashdConfLocation());
 
                 } else {
                     settings.hostname->clear();
@@ -411,9 +412,8 @@ void MainWindow::setupSettingsModal() {
                     settings.confMsg->setText("Failed to read settings for " + ac_name);
                 }
 
-                if (Settings::getInstance()->useEmbedded() == false) {
+                if (!Settings::getInstance()->useEmbedded()) {
                     config = nullptr;
-                    //Settings::getInstance()->clearZcashdConfLocation();
                 }
             }
         });

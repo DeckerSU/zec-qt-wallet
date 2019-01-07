@@ -47,13 +47,12 @@ make -j$(nproc)
 
 Launch: `./release/kmd-qt-wallet --no-embedded` (in no-embedded mode you should enter Settings (Ctrl-P) and fill connection params, or select needed coin from the list. komodod should be launched before start of kmd-qt-wallet)
 
-p.s. Now you can compile kmd-qt-wallet only with Qt 5.9.x . For example, Ubuntu 18.x have Qt 5.9.x in repos and it's fine, but Ubuntu 16.x still have Qt 5.5.1 which is not compatible with kmd-qt-wallet.
+_p.s._ Qt versions lower than 5.6.0 are incompatible with this project.
 
 ## zec-qt-wallet  ##
 
 zec-qt-wallet is a z-Addr first, Sapling compatible wallet and full node for zcashd that runs on Linux, Windows and macOS.
 
-![Screenshot](docs/screenshot-main.png?raw=true)
 ![Screenshots](docs/screenshot-sub.png?raw=true)
 
 # Installation

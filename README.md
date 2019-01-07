@@ -12,12 +12,31 @@ Coin (assetchain) selection in Settings menu (Ctrl-P) will be available if you s
 
 _PS: kmd-qt-wallet is NOT an official wallet, and is not affiliated with the Komodo / KomodoPlatform in any way._
 
+# Installation
+
+### Linux
+
+_Ubuntu 18.x_ :
+
+```
+git clone https://github.com/DeckerSU/zec-qt-wallet
+cd zec-qt-wallet
+git checkout komodo
+git pull
+QT_SELECT=5 qmake # this will produce Makefile
+make -j$(nproc)
+
+```
+
+p.s. Now you can compile kmd-qt-wallet only with Qt 5.9.x . For example, Ubuntu 18.x have Qt 5.9.x in repos and it's fine, but Ubuntu 16.x still have Qt 5.5.1 which is not compatible with kmd-qt-wallet.
+
 ## zec-qt-wallet  ##
 
 zec-qt-wallet is a z-Addr first, Sapling compatible wallet and full node for zcashd that runs on Linux, Windows and macOS.
 
 ![Screenshot](docs/screenshot-main.png?raw=true)
 ![Screenshots](docs/screenshot-sub.png?raw=true)
+
 # Installation
 
 Head over to the releases page and grab the latest installers or binary. https://github.com/ZcashFoundation/zec-qt-wallet/releases

@@ -30,10 +30,17 @@ make -j$(nproc)
 _Ubuntu 16.x_ :
 
 ```
+# installing Qt 5.9.1, bcz default Qt 5.5.1 is not good for this project
+
 wget http://download.qt.io/official_releases/qt/5.9/5.9.1/qt-opensource-linux-x64-5.9.1.run
 chmod +x qt-opensource-linux-x64-5.9.1.run
 ./qt-opensource-linux-x64-5.9.1.run
 # during installation leave install folder "AS IS", i.e. $HOME/Qt5.9.1
+
+git clone https://github.com/DeckerSU/zec-qt-wallet
+cd zec-qt-wallet
+git checkout komodo
+git pull
 $HOME/Qt5.9.1/5.9.1/gcc_64/bin/qmake 
 make -j$(nproc)
 ```

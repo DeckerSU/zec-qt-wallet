@@ -23,10 +23,22 @@ git clone https://github.com/DeckerSU/zec-qt-wallet
 cd zec-qt-wallet
 git checkout komodo
 git pull
-QT_SELECT=5 qmake # this will produce Makefile
+QT_SELECT=5 qmake 
 make -j$(nproc)
 
 ```
+_Ubuntu 16.x_ :
+
+```
+wget http://download.qt.io/official_releases/qt/5.9/5.9.1/qt-opensource-linux-x64-5.9.1.run
+chmod +x qt-opensource-linux-x64-5.9.1.run
+./qt-opensource-linux-x64-5.9.1.run
+# during installation leave install folder "AS IS", i.e. $HOME/Qt5.9.1
+$HOME/Qt5.9.1/5.9.1/gcc_64/bin/qmake 
+make -j$(nproc)
+```
+
+Launch: `./release/kmd-qt-wallet --no-embedded` (in no-embedded mode you should enter Settings (Ctrl-P) and fill connection params, or select needed coin from the list. komodod should be launched before start of kmd-qt-wallet)
 
 p.s. Now you can compile kmd-qt-wallet only with Qt 5.9.x . For example, Ubuntu 18.x have Qt 5.9.x in repos and it's fine, but Ubuntu 16.x still have Qt 5.5.1 which is not compatible with kmd-qt-wallet.
 

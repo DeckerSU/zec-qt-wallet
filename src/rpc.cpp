@@ -72,7 +72,7 @@ void RPC::setEZcashd(QProcess* p) {
     ezcashd = p;
 
     if (ezcashd && ui->tabWidget->widget(4) == nullptr) {
-        ui->tabWidget->addTab(main->zcashdtab, "zcashd");
+        ui->tabWidget->addTab(main->zcashdtab, "komodod");
     }
 }
 

@@ -29,6 +29,7 @@ RESOURCES     = application.qrc
 
 MOC_DIR = bin
 OBJECTS_DIR = bin
+RCC_DIR = bin
 UI_DIR = src
 
 CONFIG += c++14

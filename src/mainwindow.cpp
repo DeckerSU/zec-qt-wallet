@@ -468,7 +468,7 @@ void MainWindow::setupSettingsModal() {
             settings.assetchainsGroupBox->setEnabled(false);
             settings.assetchainsLabel->setEnabled(false);
 
-            Settings::getInstance()->setAssetChainName("KMD");
+            Settings::getInstance()->setAssetChainName("VRSC");
 
         }
         else {

@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
         auto conf = Settings::getInstance()->getSettings();
         Settings::getInstance()->setAssetChainName(conf.assetchain);
     } else {
-        Settings::getInstance()->setAssetChainName("KMD");
+        Settings::getInstance()->setAssetChainName("VRSC");
     }
 
     MainWindow w;

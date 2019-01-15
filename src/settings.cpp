@@ -56,7 +56,7 @@ void Settings::setUsingZcashConf(QString confLocation) {
 void Settings::setAssetChainName(QString token) {
     if (!token.isEmpty()) {
         _assetchainName = token;
-    } else _assetchainName = "KMD";
+    } else _assetchainName = "VRSC";
 }
 
 bool Settings::isTestnet() {

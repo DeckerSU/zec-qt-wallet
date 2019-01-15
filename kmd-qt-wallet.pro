@@ -12,7 +12,7 @@ PRECOMPILED_HEADER = src/precompiled.h
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = kmd-qt-wallet
+TARGET = vrsc-qt-wallet
 
 TEMPLATE = app
 

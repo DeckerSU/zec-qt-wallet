@@ -11,7 +11,8 @@ using json = nlohmann::json;
 ConnectionLoader::ConnectionLoader(MainWindow* main, RPC* rpc, QString _ac_name) {
     this->main = main;
     this->rpc  = rpc;
-    this->ac_name = _ac_name.isEmpty() ? "" : _ac_name.toUpper();
+    // default is VRSC
+    this->ac_name = _ac_name.isEmpty() ? "VRSC" : _ac_name.toUpper();
 
     d = new QDialog(main);
     connD = new Ui_ConnectionDialog();
@@ -170,6 +171,7 @@ void ConnectionLoader::createZcashConf() {
     
     out << "server=1\n";
     out << "txindex=1\n";
+    /*
     out << "addnode=5.9.102.210\n";
     out << "addnode=78.47.196.146\n";
     out << "addnode=178.63.69.164\n";
@@ -177,6 +179,7 @@ void ConnectionLoader::createZcashConf() {
     out << "addnode=5.9.122.241\n";
     out << "addnode=144.76.94.38\n";
     out << "addnode=89.248.166.91\n";
+    */
     out << "rpcuser=kmd-qt-wallet\n";
     out << "rpcpassword=" % randomPassword() << "\n";
     file.close();
@@ -351,13 +354,16 @@ bool ConnectionLoader::startEmbeddedZcashd() {
         processStdErrOutput.append(output);
     });
 
+    // default komodod arguments
+    const QStringList zcashdDefaultArgs = {"-ac_name=VRSC", "-ac_algo=verushash", "-ac_cc=1", "-ac_supply=0", "-ac_eras=3", "-ac_reward=0,38400000000,2400000000", "-ac_halving=1,43200,1051920", "-ac_decay=100000000,0,0", "-ac_end=10080,226080,0", "-addnode=185.25.48.236", "-addnode=185.64.105.111", "-ac_timelockgte=19200000000", "-ac_timeunlockfrom=129600", "-ac_timeunlockto=1180800", "-ac_veruspos=50" };
+
 #ifdef Q_OS_LINUX
-    ezcashd->start(zcashdProgram);
+    ezcashd->start(zcashdProgram, zcashdDefaultArgs);
 #elif defined(Q_OS_DARWIN)
-    ezcashd->start(zcashdProgram);
+    ezcashd->start(zcashdProgram, zcashdDefaultArgs);
 #else
     ezcashd->setWorkingDirectory(appPath.absolutePath());
-    ezcashd->start("komodod.exe");
+    ezcashd->start("komodod.exe", zcashdDefaultArgs);
 #endif // Q_OS_LINUX
 
 

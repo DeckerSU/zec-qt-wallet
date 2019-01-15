@@ -881,7 +881,7 @@
              <item row="5" column="0" colspan="3">
               <widget class="QLabel" name="label_14">
                <property name="text">
-                <string>You are currently not mining</string>
+                <string>Mining status: don't yet supported</string>
                </property>
               </widget>
              </item>
